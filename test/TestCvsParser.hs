@@ -16,6 +16,7 @@ expectedCommit1 = CvsCommit
     "2017-02-18 13:21:47 +0000"   -- date
     "jc"                          -- author
     "Exp"                         -- state
+    (2, 0)                        -- lines
 
 testParseCommit =
     let e = Right expectedCommit1 in

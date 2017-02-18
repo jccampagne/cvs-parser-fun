@@ -7,7 +7,7 @@ data CvsCommit =
               , cCommitDate     :: String
               , cCommitAuthor   :: String
               , cCommitState    :: String
-              -- , cCommitLines    :: (Int, Int)
+              , cCommitLines    :: (Int, Int)
               -- , cCommitId       :: String
               -- , cCommitLog      :: String
               }
@@ -55,6 +55,17 @@ parseCommitState = do
     s <- many1 (noneOf ";")
     return s
 
+parseCommitLines :: Parser (Int, Int)
+parseCommitLines = do
+    string "lines: "
+    char '+'
+    plusLines <- many1 (oneOf "0123456789")
+    char ' '
+    char '-'
+    minusLines <- many1 (oneOf "0123456789")
+    let pLines = read plusLines
+        mLines = read minusLines in
+        return $ (pLines, mLines)
 parseCommit :: Parser CvsCommit
 parseCommit = do
     parseCommitSeperator             <?> "missing dash seperator?"
@@ -64,5 +75,7 @@ parseCommit = do
     author    <- parseCommitAuthor   <?> "missing author?"
     parseSemicolonSpaces             <?> "missing ;?"
     state     <- parseCommitState    <?> "missing state?"
-    return $ CvsCommit revision date author state
+    parseSemicolonSpaces
+    lines     <- parseCommitLines    <?> "missing lines?"
+    return $ CvsCommit revision date author state lines
 
