@@ -42,7 +42,6 @@ parseCommitAuthor = do
     d <- many1 (noneOf ";") <?> "missing ; in author"
     return d
 
-
 parseSemicolonSpaces :: Parser ()
 parseSemicolonSpaces = do
     char ';'
@@ -54,7 +53,6 @@ parseCommitState = do
     string "state: "
     s <- many1 (noneOf ";")
     return s
-
 
 parseInteger :: Parser Int
 parseInteger = do
@@ -68,6 +66,7 @@ parseCommitLines = do
     string " -"
     minusLines <- parseInteger
     return $ (plusLines, minusLines)
+
 parseCommit :: Parser CvsCommit
 parseCommit = do
     parseCommitSeperator             <?> "missing dash seperator?"
@@ -77,7 +76,6 @@ parseCommit = do
     author    <- parseCommitAuthor   <?> "missing author?"
     parseSemicolonSpaces             <?> "missing ;?"
     state     <- parseCommitState    <?> "missing state?"
-    parseSemicolonSpaces
+    parseSemicolonSpaces             <?> "missing ;?"
     lines     <- parseCommitLines    <?> "missing lines?"
     return $ CvsCommit revision date author state lines
-
