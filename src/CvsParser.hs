@@ -55,17 +55,19 @@ parseCommitState = do
     s <- many1 (noneOf ";")
     return s
 
+
+parseInteger :: Parser Int
+parseInteger = do
+    ns <- many1 (oneOf "0123456789")
+    return $ read ns
+
 parseCommitLines :: Parser (Int, Int)
 parseCommitLines = do
-    string "lines: "
-    char '+'
-    plusLines <- many1 (oneOf "0123456789")
-    char ' '
-    char '-'
-    minusLines <- many1 (oneOf "0123456789")
-    let pLines = read plusLines
-        mLines = read minusLines in
-        return $ (pLines, mLines)
+    string "lines: +"
+    plusLines <- parseInteger
+    string " -"
+    minusLines <- parseInteger
+    return $ (plusLines, minusLines)
 parseCommit :: Parser CvsCommit
 parseCommit = do
     parseCommitSeperator             <?> "missing dash seperator?"
