@@ -5,7 +5,7 @@ import Text.ParserCombinators.Parsec
 data CvsCommit =
     CvsCommit { cCommitRevision :: String
               , cCommitDate     :: String
-              -- , cCommitAuthor   :: String
+              , cCommitAuthor   :: String
               -- , cCommitState    :: String
               -- , cCommitLines    :: (Int, Int)
               -- , cCommitId       :: String
@@ -36,11 +36,25 @@ parseCommitDate = do
     d <- many1 (noneOf ";") <?> "missing ; in date"
     return d
 
+parseCommitAuthor :: Parser String
+parseCommitAuthor = do
+    string "author: "
+    d <- many1 (noneOf ";") <?> "missing ; in author"
+    return d
+
+
+parseSemicolonSpaces :: Parser ()
+parseSemicolonSpaces = do
+    char ';'
+    many1 (char ' ')
+    return ()
+
 parseCommit :: Parser CvsCommit
 parseCommit = do
-    parseCommitSeperator <?> "no sep?"
-    revision <- parseCommitRevision <?> "no revision?"
-    date <- parseCommitDate <?> "no date?"
-
-    return $ CvsCommit revision date
+    parseCommitSeperator             <?> "missing dash seperator?"
+    revision  <- parseCommitRevision <?> "missing revision?"
+    date      <- parseCommitDate     <?> "missing date?"
+    parseSemicolonSpaces             <?> "missing ;?"
+    author    <- parseCommitAuthor   <?> "missing author?"
+    return $ CvsCommit revision date author
 
