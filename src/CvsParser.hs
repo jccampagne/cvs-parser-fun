@@ -6,7 +6,7 @@ data CvsCommit =
     CvsCommit { cCommitRevision :: String
               , cCommitDate     :: String
               , cCommitAuthor   :: String
-              -- , cCommitState    :: String
+              , cCommitState    :: String
               -- , cCommitLines    :: (Int, Int)
               -- , cCommitId       :: String
               -- , cCommitLog      :: String
@@ -49,6 +49,12 @@ parseSemicolonSpaces = do
     many1 (char ' ')
     return ()
 
+parseCommitState :: Parser String
+parseCommitState = do
+    string "state: "
+    s <- many1 (noneOf ";")
+    return s
+
 parseCommit :: Parser CvsCommit
 parseCommit = do
     parseCommitSeperator             <?> "missing dash seperator?"
@@ -56,5 +62,7 @@ parseCommit = do
     date      <- parseCommitDate     <?> "missing date?"
     parseSemicolonSpaces             <?> "missing ;?"
     author    <- parseCommitAuthor   <?> "missing author?"
-    return $ CvsCommit revision date author
+    parseSemicolonSpaces             <?> "missing ;?"
+    state     <- parseCommitState    <?> "missing state?"
+    return $ CvsCommit revision date author state
 
