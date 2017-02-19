@@ -9,7 +9,7 @@ data CvsCommit =
               , cCommitState    :: String
               , cCommitLines    :: (Int, Int)
               , cCommitId       :: String
-              -- , cCommitLog      :: String
+              , cCommitLog      :: String
               }
     deriving (Eq, Show)
 
@@ -73,6 +73,11 @@ parseCommitId = do
     cId <- many1 (noneOf ";")
     return cId
 
+parseLog :: Parser String
+parseLog = do
+    l <- many1 anyToken
+    return l
+
 parseCommit :: Parser CvsCommit
 parseCommit = do
     parseCommitSeperator             <?> "missing dash seperator?"
@@ -86,5 +91,7 @@ parseCommit = do
     lines     <- parseCommitLines    <?> "missing lines?"
     parseSemicolonSpaces             <?> "missing ;?"
     commitId  <- parseCommitId       <?> "missing commitid?"
+    char ';'                         <?> "missing ;?"
     char '\n'                        <?> "missing eol?"
-    return $ CvsCommit revision date author state lines commitId
+    log       <- parseLog            <?> "missing log?"
+    return $ CvsCommit revision date author state lines commitId log

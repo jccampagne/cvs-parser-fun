@@ -18,6 +18,7 @@ expectedCommit1 = CvsCommit
     "Exp"                         -- state
     (2, 0)                        -- lines
     "puTKUR3zNxli5rGz"            -- commit id
+    "Edit b\n"                    -- log
 
 testParseCommit =
     let e = Right expectedCommit1 in
